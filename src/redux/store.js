@@ -1,17 +1,17 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import { authReducer } from './authSlice/authSlice';
-import { gamesSlice } from './gamesSlice/gamesSlice';
 import {
-  persistStore,
-  persistReducer,
   FLUSH,
-  REHYDRATE,
   PAUSE,
   PERSIST,
   PURGE,
   REGISTER,
+  REHYDRATE,
+  persistReducer,
+  persistStore,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import { authReducer } from './authSlice/authSlice';
+import { gamesReducer } from './gamesSlice/gamesSlice';
 
 const persistConfig = {
   key: 'auth',
@@ -22,7 +22,7 @@ const persistConfig = {
 export const store = configureStore({
   reducer: {
     auth: persistReducer(persistConfig, authReducer),
-    games: gamesSlice,
+    games: gamesReducer,
   },
   middleware: getDefaultMiddleware({
     serializableCheck: {
