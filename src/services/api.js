@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useDispatch } from 'react-redux';
-import { setUser } from '../redux/authSlice/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout, setUser } from '../redux/authSlice/authSlice';
 
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 const API_GAMES_URL = import.meta.env.VITE_API_GAMES_URL;
@@ -26,7 +26,6 @@ export const useRegister = () => {
       return response.json();
     },
     onSuccess: data => {
-      console.log('data =>', data);
       dispatch(
         setUser({
           user: data.user,
@@ -46,8 +45,8 @@ export const useRegister = () => {
 
   return {
     registerUser,
-    isLoading: registerMutation.isLoading,
-    isError: registerMutation.isError,
+    isLoadingRegister: registerMutation.isLoading,
+    isErrorRegister: registerMutation.isError,
   };
 };
 
@@ -91,19 +90,25 @@ export const useLogin = () => {
 
   return {
     loginUser,
-    isLoading: loginMutation.isLoading,
-    isError: loginMutation.isError,
+    isLoadingLogin: loginMutation.isLoading,
+    isErrorLogin: loginMutation.isError,
   };
 };
 
 export const useCurrentUser = () => {
+  const { token } = useSelector(state => state.auth);
+
   return useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
+      if (!token) {
+        return null;
+      }
+
       const response = await fetch(`${API_AUTH_URL}/current`, {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -112,52 +117,48 @@ export const useCurrentUser = () => {
       }
 
       const data = await response.json();
-      return data.user;
+      return data;
     },
   });
 };
 
 export const useLogout = () => {
-  const queryClient = useQueryClient();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+  const { token } = useSelector(state => state.auth);
 
   const logoutMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch(`${API_AUTH_URL}/logout`, {
+    mutationFn: () => {
+      fetch(`${API_AUTH_URL}/logout`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${token}`,
         },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to logout user');
-      }
+      }).then(response => console.log(response));
     },
     onSuccess: () => {
-      dispatch(setUser({ user: null, token: null }));
-      queryClient.setQueryData('currentUser', null);
+      dispatch(logout());
+      queryClient.clear();
     },
     onError: error => {
       console.error('Logout failed:', error.message);
     },
   });
 
-  const logoutUser = async () => {
-    await logoutMutation.mutateAsync();
+  const logoutUser = () => {
+    logoutMutation.mutateAsync();
   };
 
   return {
     logoutUser,
-    isLoading: logoutMutation.isLoading,
-    isError: logoutMutation.isError,
+    isLoadingLogout: logoutMutation.isLoading,
+    isErrorLogout: logoutMutation.isError,
   };
 };
 
-export const useGamesQuery = (page = 1, genre = 'ALL', gamesToShow = 9) => {
-  console.log(API_GAMES_URL);
-  const query = useQuery({
-    queryKey: ['games', page, genre],
+export const useGames = (page = 1, genre = 'ALL', gamesToShow = 9) => {
+  return useQuery({
+    queryKey: ['games', page, genre, gamesToShow],
     queryFn: async () => {
       const response = await fetch(`${API_GAMES_URL}/games/by_page`, {
         method: 'POST',
@@ -167,16 +168,12 @@ export const useGamesQuery = (page = 1, genre = 'ALL', gamesToShow = 9) => {
         body: JSON.stringify({
           page,
           isFreshGamesFirst: true,
-          genre,
+          genre: genre === 'ALL' ? false : genre,
           gamesToShow,
         }),
       });
 
-      const data = await response.json();
-      console.log('useGamesQuery, data =>', data);
-      return data;
+      return response.json();
     },
   });
-  console.log('query =>', query);
-  return query;
 };

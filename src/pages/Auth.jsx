@@ -6,39 +6,48 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [isRegister, setIsRegister] = useState(false);
 
-  const { loginUser, isLoading: isLoggingIn, isError: loginError } = useLogin();
-  const { registerUser, isLoading: isRegistering, isError: registerError } = useRegister();
-  const handleAuthAction = async () => {
-      console.log(email, password)
+  const { loginUser, isErrorLogin } = useLogin();
+  const { registerUser, isErrorRegister } = useRegister();
+
+  const handleAuthAction = async e => {
+    e.preventDefault();
+
     if (isRegister) {
       await registerUser({ email, password });
     } else {
       await loginUser({ email, password });
     }
   };
+
   return (
     <div>
-      <h1>{isRegister ? 'Register' : 'Login'}</h1>
-      <input
-        type="text"
-        placeholder="Email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-      />
-      <button onClick={handleAuthAction} disabled={isRegistering || isLoggingIn}>
-        {isRegister ? 'Register' : 'Login'}
-      </button>
-      <button type="button" onClick={() => setIsRegister(!isRegister)}>
-        {isRegister ? 'Already have an account? Login' : 'Need an account? Register'}
-      </button>
-      {isRegister && registerError && <div>Error registering</div>}
-      {!isRegister && loginError && <div>Error logging in</div>}
+      <form onSubmit={handleAuthAction}>
+        <h1>{isRegister ? 'Register' : 'Login'}</h1>
+        <input
+          type="text"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit" disabled={!email || !password}>
+          {isRegister ? 'Register' : 'Login'}
+        </button>
+
+        <button type="button" onClick={() => setIsRegister(!isRegister)}>
+          {isRegister ? 'Already have an account? Login' : 'Need an account? Register'}
+        </button>
+      </form>
+
+      {isRegister && isErrorRegister && <div>Error registering</div>}
+      {!isRegister && isErrorLogin && <div>Error logging in</div>}
     </div>
   );
 };
