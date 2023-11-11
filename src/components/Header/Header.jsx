@@ -3,13 +3,12 @@ import { NavLink } from 'react-router-dom';
 import { useLogout } from '../../services/api';
 
 const AppBar = () => {
-  const { token } = useSelector(state => state.auth);
   const user = useSelector(state => state.auth.user);
-  const { logoutUser, isLoadingLogout } = useLogout(token);
+  const { logoutUser, isLoadingLogout } = useLogout();
 
   const handleLogout = async () => {
     try {
-      await logoutUser();
+      logoutUser();
     } catch (error) {
       console.error('Failed to logout:', error);
     }
