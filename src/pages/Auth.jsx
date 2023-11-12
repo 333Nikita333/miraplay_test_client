@@ -6,8 +6,8 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [isRegister, setIsRegister] = useState(false);
 
-  const { loginUser, isErrorLogin } = useLogin();
-  const { registerUser, isErrorRegister } = useRegister();
+  const { loginUser, isErrorLogin, loginErrorMessage } = useLogin();
+  const { registerUser, isErrorRegister, registerErrorMessage } = useRegister();
 
   const handleAuthAction = async e => {
     e.preventDefault();
@@ -58,13 +58,14 @@ const Auth = () => {
       </form>
 
       {isRegister && isErrorRegister && (
-        <div style={{ color: 'white', fontSize: '36px', textAlign: 'center' }}>
-          Error registering
+        <div style={{ color: 'red', fontSize: '23px', textAlign: 'center' }}>
+          {registerErrorMessage}
         </div>
       )}
       {!isRegister && isErrorLogin && (
-        <div style={{ color: 'white', fontSize: '36px', textAlign: 'center' }}>
-          Error logging in
+        <div style={{ color: 'red', fontSize: '23px', textAlign: 'center' }}>
+          {/* Error logging in */}
+          {loginErrorMessage}
         </div>
       )}
 

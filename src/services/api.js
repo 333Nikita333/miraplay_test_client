@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, setUser } from '../redux/authSlice/authSlice';
+import { useState } from 'react';
 
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 const API_GAMES_URL = import.meta.env.VITE_API_GAMES_URL;
@@ -8,6 +9,7 @@ const API_GAMES_URL = import.meta.env.VITE_API_GAMES_URL;
 export const useRegister = () => {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
+  const [registerErrorMessage, setRegisterErrorMessage] = useState(null);
 
   const registerMutation = useMutation({
     mutationFn: async ({ email, password }) => {
@@ -20,7 +22,8 @@ export const useRegister = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to register user');
+        const errorData = await response.json();
+        throw new Error(errorData.message);
       }
 
       return response.json();
@@ -35,6 +38,7 @@ export const useRegister = () => {
       queryClient.setQueryData('currentUser', data.user);
     },
     onError: error => {
+      setRegisterErrorMessage(error.message);
       console.error('Registration failed:', error.message);
     },
   });
@@ -47,12 +51,14 @@ export const useRegister = () => {
     registerUser,
     isLoadingRegister: registerMutation.isLoading,
     isErrorRegister: registerMutation.isError,
+    registerErrorMessage,
   };
 };
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
+  const [loginErrorMessage, setLoginErrorMessage] = useState(null);
 
   const loginMutation = useMutation({
     mutationFn: async ({ email, password }) => {
@@ -65,7 +71,8 @@ export const useLogin = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to login user');
+        const errorData = await response.json();
+        throw new Error(errorData.message);
       }
 
       return response.json();
@@ -80,6 +87,7 @@ export const useLogin = () => {
       queryClient.setQueryData('currentUser', data.user);
     },
     onError: error => {
+      setLoginErrorMessage(error.message);
       console.error('Login failed:', error.message);
     },
   });
@@ -92,6 +100,7 @@ export const useLogin = () => {
     loginUser,
     isLoadingLogin: loginMutation.isLoading,
     isErrorLogin: loginMutation.isError,
+    loginErrorMessage,
   };
 };
 
