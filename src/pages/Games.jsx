@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useGames } from '../services/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearGames, setGames } from '../redux/gamesSlice/gamesSlice';
+import { useGames } from '../services/api';
 
 const genres = [
   'ALL',
@@ -54,45 +54,94 @@ const Games = () => {
   };
 
   return (
-    <div>
-      <h1>Games</h1>
-      <div>
-        {genres.map(g => (
-          <label key={g}>
-            <input
-              type="radio"
-              value={g}
-              checked={genre === g}
-              onChange={() => handleGenreChange(g)}
-            />
-            {g}
-          </label>
-        ))}
-        <label>
-          Sort:
-          <select value={isNewGamesFirst} onChange={() => handleDateChange()}>
-            <option value="true">Newest</option>
-            <option value="false">Oldest</option>
-          </select>
-        </label>
-      </div>
-      {isLoading && games.length === 0 ? (
-        <div>Loading...</div>
-      ) : isError ? (
-        <div>Error loading games</div>
-      ) : (
-        <div>
-          {games.map(game => (
-            <div key={game._id}>
-              <h2>{game.commonGameName}</h2>
-              <p>{game.gameDescription}</p>
-              <img src={game.gameImage} alt={game.commonGameName} />
+    <section className="AllGames_container">
+      {games.length > 0 && (
+        <>
+          <h4 className="AllGames_title">Our games</h4>
+
+          <div className="AllGames_list-filters">
+            <div className="AllGames_filter">
+              <ul className="AllGames_genresList">
+                {genres.map(g => (
+                  <label
+                    className={`AllGames_genresItem ${
+                      genre === g ? 'AllGames_genresItem-active' : ''
+                    }`}
+                    key={g}
+                  >
+                    <input
+                      type="radio"
+                      value={g}
+                      checked={genre === g}
+                      onChange={() => handleGenreChange(g)}
+                    />
+                    {g}
+                  </label>
+                ))}
+              </ul>
             </div>
-          ))}
-          {games.length < gamesListLength && <button onClick={handleLoadMore}>Show More</button>}
+
+            <div className="AllGames__date">
+              <label>
+                <span>Sort:</span>
+                <select value={isNewGamesFirst} onChange={() => handleDateChange()}>
+                  <option className="AllGames__dateText" value="true">
+                    Newest
+                  </option>
+                  <option className="AllGames__dateText" value="false">
+                    Oldest
+                  </option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <ul className="AllGames_gamesList">
+            {games.map(game => (
+              <div key={game._id}>
+                <li className="GameCard_item">
+                  <img
+                    className="GameCard_img"
+                    src={game.gameImage || game.img}
+                    alt={game.commonGameName}
+                    loading="lazy"
+                  />
+                  <div className="GameCard_bottomSide">
+                    <h4 className="GameCard_title">{game.commonGameName}</h4>
+                    <p className="GameCard_description">
+                      {game.gameDescription
+                        ? game.gameDescription.slice(0, 220) + '...'
+                        : 'Опис відсутній'}
+                    </p>
+                  </div>
+                  <div className="GameCard_genre">
+                    {game.inTop && <p className="GameCard_topItem">TOP</p>}
+                    {game.genre && <p className="GameCard_genreItem">{game.genre}</p>}
+                  </div>
+                  <p className="GameCard_freeItem">{game.gameClass}</p>
+                </li>
+              </div>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {isLoading && !isError && (
+        <div style={{ color: 'white', fontSize: '36px', textAlign: 'center' }}>Loading...</div>
+      )}
+
+      {isError && !isLoading && (
+        <div style={{ color: 'white', fontSize: '36px', textAlign: 'center' }}>
+          Error loading games
         </div>
       )}
-    </div>
+
+      {!isLoading && !isError && games.length < gamesListLength && (
+        <button className="AllGames_btnMore" onClick={handleLoadMore}>
+          Show More
+        </button>
+      )}
+    </section>
   );
 };
 

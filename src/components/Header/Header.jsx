@@ -15,19 +15,30 @@ const AppBar = () => {
   };
 
   return (
-    <header>
-      <nav>
-        <NavLink to="/">Home</NavLink>
-        {user ? (
-          <>
-            <NavLink to="/games">Games</NavLink>
-            <button onClick={handleLogout} disabled={isLoadingLogout}>
-              Logout
-            </button>
-          </>
-        ) : (
-          <NavLink to="/auth">Authentication</NavLink>
-        )}
+    <header className="header">
+      <nav className="nav">
+        <div className="nav_list">
+          <NavLink className="nav_item" to="/">
+            <span className="nav_title">Home</span>
+          </NavLink>
+          {user ? (
+            <>
+              <NavLink className="nav_item" to="/games">
+                <span className="nav_title">Games</span>
+              </NavLink>
+              <div>
+                Welcome, {user.email}!
+                <button className="btn_logout" onClick={handleLogout} disabled={isLoadingLogout}>
+                  Logout
+                </button>
+              </div>
+            </>
+          ) : (
+            <NavLink className="nav_item" to="/auth">
+              <span className="nav_title">Authentication</span>
+            </NavLink>
+          )}
+        </div>
       </nav>
     </header>
   );

@@ -20,35 +20,62 @@ const Auth = () => {
   };
 
   return (
-    <div>
-      <form onSubmit={handleAuthAction}>
-        <h1>{isRegister ? 'Register' : 'Login'}</h1>
-        <input
-          type="text"
-          placeholder="Email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit" disabled={!email || !password}>
-          {isRegister ? 'Register' : 'Login'}
-        </button>
-
-        <button type="button" onClick={() => setIsRegister(!isRegister)}>
-          {isRegister ? 'Already have an account? Login' : 'Need an account? Register'}
+    <section className="Authorization_content">
+      <form className="Authorization_form" onSubmit={handleAuthAction}>
+        <h3 className="Authorization_title">Спробуй нові відчуття</h3>
+        <p className="Authorization_subTitle">
+          {isRegister
+            ? 'Зареєструйся, щоб грати на максималках у свої улюблені ігри'
+            : 'Увійди, щоб грати на максималках у свої улюблені ігри'}
+        </p>
+        <label className="Authorization_label">
+          введіть ваш email:
+          <input
+            className="Authorization_input"
+            type="text"
+            name="email"
+            placeholder="youremail@miraplay.com"
+            required
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
+        </label>
+        <label className="Authorization_label">
+          введіть ваш пароль:
+          <input
+            className="Authorization_input"
+            type="password"
+            placeholder="ваш пароль"
+            name="password"
+            required
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+          />
+        </label>
+        <button className="Authorization_submitBtn" type="submit" disabled={!email || !password}>
+          {isRegister ? 'РЕЄСТРАЦІЯ' : 'ВХІД'}
         </button>
       </form>
 
-      {isRegister && isErrorRegister && <div>Error registering</div>}
-      {!isRegister && isErrorLogin && <div>Error logging in</div>}
-    </div>
+      {isRegister && isErrorRegister && (
+        <div style={{ color: 'white', fontSize: '36px', textAlign: 'center' }}>
+          Error registering
+        </div>
+      )}
+      {!isRegister && isErrorLogin && (
+        <div style={{ color: 'white', fontSize: '36px', textAlign: 'center' }}>
+          Error logging in
+        </div>
+      )}
+
+      <button
+        className="Authorization_changeAuth"
+        type="button"
+        onClick={() => setIsRegister(!isRegister)}
+      >
+        {isRegister ? 'Вже є аккаунт?' : 'Потрібен аккаунт?'} Тисни
+      </button>
+    </section>
   );
 };
 
