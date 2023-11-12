@@ -156,9 +156,9 @@ export const useLogout = () => {
   };
 };
 
-export const useGames = (page = 1, genre = 'ALL', gamesToShow = 9) => {
+export const useGames = (page = 1, genre = 'ALL', isFreshGamesFirst = true, gamesToShow = 9) => {
   return useQuery({
-    queryKey: ['games', page, genre, gamesToShow],
+    queryKey: ['games', page, genre, isFreshGamesFirst, gamesToShow],
     queryFn: async () => {
       const response = await fetch(`${API_GAMES_URL}/games/by_page`, {
         method: 'POST',
@@ -167,7 +167,7 @@ export const useGames = (page = 1, genre = 'ALL', gamesToShow = 9) => {
         },
         body: JSON.stringify({
           page,
-          isFreshGamesFirst: true,
+          isFreshGamesFirst,
           genre: genre === 'ALL' ? false : genre,
           gamesToShow,
         }),

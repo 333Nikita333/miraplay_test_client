@@ -3,6 +3,20 @@ import { useGames } from '../services/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearGames, setGames } from '../redux/gamesSlice/gamesSlice';
 
+const genres = [
+  'ALL',
+  'FREE',
+  'MOBA',
+  'SHOOTERS',
+  'LAUNCHERS',
+  'MMORPG',
+  'STRATEGY',
+  'FIGHTING',
+  'RACING',
+  'SURVIVAL',
+  'ONLINE',
+];
+
 const Games = () => {
   const dispatch = useDispatch();
   const games = useSelector(state => state.games.games);
@@ -10,8 +24,9 @@ const Games = () => {
 
   const [page, setPage] = useState(1);
   const [genre, setGenre] = useState('ALL');
+  const [isNewGamesFirst, setIsNewGamesFirst] = useState(true);
 
-  const { data, isLoading, isError } = useGames(page, genre);
+  const { data, isLoading, isError } = useGames(page, genre, isNewGamesFirst);
 
   useEffect(() => {
     if (data && data.games) {
@@ -32,15 +47,34 @@ const Games = () => {
     setPage(1);
   };
 
+  const handleDateChange = () => {
+    setIsNewGamesFirst(!isNewGamesFirst);
+    dispatch(clearGames());
+    setPage(1);
+  };
+
   return (
     <div>
       <h1>Games</h1>
       <div>
-        <select value={genre} onChange={e => handleGenreChange(e.target.value)}>
-          <option value="ALL">All</option>
-          <option value="FREE">Free</option>
-          {/* Другие варианты жанров */}
-        </select>
+        {genres.map(g => (
+          <label key={g}>
+            <input
+              type="radio"
+              value={g}
+              checked={genre === g}
+              onChange={() => handleGenreChange(g)}
+            />
+            {g}
+          </label>
+        ))}
+        <label>
+          Sort:
+          <select value={isNewGamesFirst} onChange={() => handleDateChange()}>
+            <option value="true">Newest</option>
+            <option value="false">Oldest</option>
+          </select>
+        </label>
       </div>
       {isLoading && games.length === 0 ? (
         <div>Loading...</div>
@@ -53,7 +87,6 @@ const Games = () => {
               <h2>{game.commonGameName}</h2>
               <p>{game.gameDescription}</p>
               <img src={game.gameImage} alt={game.commonGameName} />
-              {/* Остальная информация о игре */}
             </div>
           ))}
           {games.length < gamesListLength && <button onClick={handleLoadMore}>Show More</button>}
