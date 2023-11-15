@@ -1,4 +1,4 @@
-# Test Task from company Doka Development
+# Test Task from company Doka Development (Front-end)
 This test task is a small Full Stack web application with authorization and display of a list of games after it. The entire Front-end part is developed using the following technologies: React.js, Redux, React Query (for HTTP requests), and react-router-dom. Back-end for this test task - [GitHub](https://github.com/333Nikita333/miraplay_test_server)
 
 ## Pages:
